@@ -164,7 +164,7 @@ services:
       - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
       - CORE_PEER_CHAINCODEADDRESS=peer0.distributor.pharma-net.com:9052
       - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.users.property-registration-network.com:9051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.distributor.pharma-net.com:9051
       - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.distributor.pharma-net.com:10051
       - CORE_PEER_LOCALMSPID=distributorMSP
     volumes:

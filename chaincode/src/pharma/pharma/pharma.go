@@ -43,7 +43,7 @@ func (p *Pharma) InitPharmaLedger(ctx contractapi.TransactionContextInterface) e
 }
 
 // Invokes the RegisterCompany smart contract to register a new company
-func (p *Pharma) RegisterCompany(ctx contractapi.TransactionContextInterface) (*Company, error) {
+func (p *Pharma) RegisterCompany(ctx contractapi.TransactionContextInterface) (string, error) {
 	
 	
 type CompanyInput struct {
@@ -55,7 +55,7 @@ type CompanyInput struct {
 	// Get the function invoking client's MSP ID
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
-		return nil, fmt.Errorf("failed getting the client's MSPID: %v", err)
+		return "", fmt.Errorf("failed getting the client's MSPID: %v", err)
 	}
 	
 	/*peerMSPID, err := shim.GetMSPID()
@@ -67,41 +67,42 @@ type CompanyInput struct {
 		return nil, fmt.Errorf("client from org %v is not authorized to read or write private data from an org %v peer", clientMSPID, peerMSPID)
 	}*/
 
+
 	// Records are passed in transient field to make it more secure.
 	transientMap, err := ctx.GetStub().GetTransient()
 	if err != nil {
-		return nil, fmt.Errorf("error getting transient: %v", err)
+		return "", fmt.Errorf("error getting transient: %v", err)
 	}
 
 	transientCompanyJSON, ok := transientMap["company_records"]
 	if !ok {
 		//log error to stdout
-		return nil, fmt.Errorf("Company not found in the transient map input")
+		return "", fmt.Errorf("Company not found in the transient map input")
 	}
 
 	var companyInput CompanyInput
 
 	err = json.Unmarshal(transientCompanyJSON, &companyInput)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal JSON: %v", err)
+		return "", fmt.Errorf("failed to unmarshal JSON: %v", err)
 	}
 
 	if len(companyInput.CompanyCRN) == 0 {
-		return nil, fmt.Errorf("CompanyCRN field must be a non-empty string")
+		return "", fmt.Errorf("CompanyCRN field must be a non-empty string")
 	}
 	if len(companyInput.Name) == 0 {
-		return nil, fmt.Errorf("Name  must be a non-empty string")
+		return "", fmt.Errorf("Name  must be a non-empty string")
 	}
 	if len(companyInput.Location) == 0 {
-		return nil, fmt.Errorf("Location field must be a non-empty string")
+		return "", fmt.Errorf("Location field must be a non-empty string")
 	}
 	if len(companyInput.OrganizationRole) == 0 {
-		return nil, fmt.Errorf("OrganizationRole field must be a non-empty string")
+		return "", fmt.Errorf("OrganizationRole field must be a non-empty string")
 	}
 
 	companyCompositeKey, err := ctx.GetStub().CreateCompositeKey("company.pharma-net.com", []string{companyInput.CompanyCRN, companyInput.Name})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create composite key into JSON: %v", err)
+		return "", fmt.Errorf("failed to create composite key into JSON: %v", err)
 	}
 
 
@@ -124,34 +125,37 @@ type CompanyInput struct {
 	}
 
 	marshaledCompany, err := json.Marshal(company)
+	fmt.Println(string(marshaledCompany))
+	fmt.Println(&company)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal company into JSON: %v", err)
+		return "", fmt.Errorf("failed to marshal company into JSON: %v", err)
 	}
 	err = ctx.GetStub().PutState(companyCompositeKey, marshaledCompany)
 	if err != nil {
-		return nil, fmt.Errorf("failed to put company: %v", err)
+		return "", fmt.Errorf("failed to put company: %v", err)
 	}
 	
-	return &company, nil
+	
+	return string(marshaledCompany), nil
 	
 }
 
 // Invokes the AddDrug smart contract to add a drug to the state ledger
-func (p *Pharma) AddDrug(ctx contractapi.TransactionContextInterface) (*manufacturer.Drug, error) {
+func (p *Pharma) AddDrug(ctx contractapi.TransactionContextInterface) (string, error) {
 	var manufacturer *manufacturer.Manufacturer
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
-		return nil, fmt.Errorf("failed getting the client's MSPID: %v", err)
+		return "", fmt.Errorf("failed getting the client's MSPID: %v", err)
 	}
 
 	if clientMSPID != "manufacturerMSP" {
-		return nil, fmt.Errorf("client from org %v is not authorized to add new drug", clientMSPID)
+		return "", fmt.Errorf("client from org %v is not authorized to add new drug", clientMSPID)
 	}
 
 	// Records are passed in transient field to make it more secure.
 	transientMap, err := ctx.GetStub().GetTransient()
 	if err != nil {
-		return nil, fmt.Errorf("error getting transient: %v", err)
+		return "", fmt.Errorf("error getting transient: %v", err)
 	}
 
 
@@ -159,36 +163,36 @@ func (p *Pharma) AddDrug(ctx contractapi.TransactionContextInterface) (*manufact
 	transientDrugJSON, ok := transientMap["drug_information"]
 	if !ok {
 		//log error to stdout
-		return nil, fmt.Errorf("new Drug not found in the transient map input")
+		return "", fmt.Errorf("new Drug not found in the transient map input")
 	}
 
 	newDrug, err := manufacturer.AddDrug(ctx, transientDrugJSON)
 	if err != nil {
-		return nil, fmt.Errorf("failed to add drug: %v", err)
+		return "", fmt.Errorf("failed to add drug: %v", err)
 	}
 
 	return newDrug, nil
 }
 
 // Invokes the CreatePO smart contract in distributor or retailer to create a purchase order
-func (p *Pharma) CreatePO(ctx contractapi.TransactionContextInterface) (*distributor.PurchaseOrder, error) {
+func (p *Pharma) CreatePO(ctx contractapi.TransactionContextInterface) (string, error) {
 	var distributorContract *distributor.Distributor
 	var retailerContract *retailer.Retailer
-	var newPO *distributor.PurchaseOrder
+	var newPO string
 
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
-		return nil, fmt.Errorf("failed getting the client's MSPID: %v", err)
+		return "", fmt.Errorf("failed getting the client's MSPID: %v", err)
 	}
 
 	if clientMSPID != "distributorMSP" && clientMSPID != "retailerMSP"{
-		return nil, fmt.Errorf("client from org %v is not authorized to create purchase order", clientMSPID)
+		return "", fmt.Errorf("client from org %v is not authorized to create purchase order", clientMSPID)
 	}
 
 	// Records are passed in transient field to make it more secure.
 	transientMap, err := ctx.GetStub().GetTransient()
 	if err != nil {
-		return nil, fmt.Errorf("error getting transient: %v", err)
+		return "", fmt.Errorf("error getting transient: %v", err)
 	}
 
 
@@ -196,18 +200,18 @@ func (p *Pharma) CreatePO(ctx contractapi.TransactionContextInterface) (*distrib
 	transientPOJSON, ok := transientMap["po_information"]
 	if !ok {
 		//log error to stdout
-		return nil, fmt.Errorf("new PO not found in the transient map input")
+		return "", fmt.Errorf("new PO not found in the transient map input")
 	}
 
 	if clientMSPID == "distributorMSP" {
 		newPO, err = distributorContract.CreatePO(ctx, transientPOJSON)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create purchase order: %v", err)
+			return "", fmt.Errorf("failed to create purchase order: %v", err)
 		} 
 	} else {
 		newPO, err = retailerContract.CreatePO(ctx, transientPOJSON)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create purchase order: %v", err)
+			return "", fmt.Errorf("failed to create purchase order: %v", err)
 		} 
 	}
 	
@@ -216,35 +220,35 @@ func (p *Pharma) CreatePO(ctx contractapi.TransactionContextInterface) (*distrib
 }
 
 // Invokes the CreateShipment smart contract in manufacturer or distributor to create shipment transaction
-func (p *Pharma) CreateShipment(ctx contractapi.TransactionContextInterface) (*manufacturer.Shipment, error) {
+func (p *Pharma) CreateShipment(ctx contractapi.TransactionContextInterface) (string, error) {
 	var manufacturerContract *manufacturer.Manufacturer
-	var newShipment *manufacturer.Shipment
+	var newShipment string
 
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
-		return nil, fmt.Errorf("failed getting the client's MSPID: %v", err)
+		return "", fmt.Errorf("failed getting the client's MSPID: %v", err)
 	}
 
 	if clientMSPID != "distributorMSP" && clientMSPID != "manufacturerMSP"{
-		return nil, fmt.Errorf("client from org %v is not authorized to create shipment", clientMSPID)
+		return "", fmt.Errorf("client from org %v is not authorized to create shipment", clientMSPID)
 	}
 
 	// Records are passed in transient field to make it more secure.
 	transientMap, err := ctx.GetStub().GetTransient()
 	if err != nil {
-		return nil, fmt.Errorf("error getting transient: %v", err)
+		return "", fmt.Errorf("error getting transient: %v", err)
 	}
 
 	transientShipmentJSON, ok := transientMap["shipment_information"]
 	if !ok {
 		//log error to stdout
-		return nil, fmt.Errorf("new Shipment not found in the transient map input")
+		return "", fmt.Errorf("new Shipment not found in the transient map input")
 	}
 
 
 	newShipment, err = manufacturerContract.CreateShipment(ctx, transientShipmentJSON)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create shipment: %v", err)
+		return "", fmt.Errorf("failed to create shipment: %v", err)
 	} 
 	
 
@@ -252,36 +256,36 @@ func (p *Pharma) CreateShipment(ctx contractapi.TransactionContextInterface) (*m
 }
 
 // Invokes the UpdateShipment smart contract in transporter to update shipment transaction
-func (p *Pharma) UpdateShipment(ctx contractapi.TransactionContextInterface) (*manufacturer.Shipment, error) {
+func (p *Pharma) UpdateShipment(ctx contractapi.TransactionContextInterface) (string, error) {
 	var transporterContract *transporter.Transporter
-	var updateShipment *manufacturer.Shipment
+	var updateShipment string
 
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
-		return nil, fmt.Errorf("failed getting the client's MSPID: %v", err)
+		return "", fmt.Errorf("failed getting the client's MSPID: %v", err)
 	}
 
 	if clientMSPID != "transporterMSP" {
-		return nil, fmt.Errorf("client from org %v is not authorized to update shipment", clientMSPID)
+		return "", fmt.Errorf("client from org %v is not authorized to update shipment", clientMSPID)
 	}
 
 	// Records are passed in transient field to make it more secure.
 	transientMap, err := ctx.GetStub().GetTransient()
 	if err != nil {
-		return nil, fmt.Errorf("error getting transient: %v", err)
+		return "", fmt.Errorf("error getting transient: %v", err)
 	}
 
 
 	transientShipmentJSON, ok := transientMap["update_information"]
 	if !ok {
 		//log error to stdout
-		return nil, fmt.Errorf("update Shipment not found in the transient map input")
+		return "", fmt.Errorf("update Shipment not found in the transient map input")
 	}
 
 
 	updateShipment, err = transporterContract.UpdateShipment(ctx, transientShipmentJSON)
 	if err != nil {
-		return nil, fmt.Errorf("failed to update shipment: %v", err)
+		return "", fmt.Errorf("failed to update shipment: %v", err)
 	} 
 	
 
@@ -289,38 +293,38 @@ func (p *Pharma) UpdateShipment(ctx contractapi.TransactionContextInterface) (*m
 }
 
 // Invokes the RetailDrug smart contract in retailer to sell drug to customers
-func (p *Pharma) RetailDrug(ctx contractapi.TransactionContextInterface) error {
+func (p *Pharma) RetailDrug(ctx contractapi.TransactionContextInterface) (string, error) {
 	var retailerContract *retailer.Retailer
 
 	clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 	if err != nil {
-		return fmt.Errorf("failed getting the client's MSPID: %v", err)
+		return "", fmt.Errorf("failed getting the client's MSPID: %v", err)
 	}
 
 	if clientMSPID != "retailerMSP"{
-		return fmt.Errorf("client from org %v is not authorized to create shipment", clientMSPID)
+		return "", fmt.Errorf("client from org %v is not authorized to create shipment", clientMSPID)
 	}
 
 	// Records are passed in transient field to make it more secure.
 	transientMap, err := ctx.GetStub().GetTransient()
 	if err != nil {
-		return fmt.Errorf("error getting transient: %v", err)
+		return "", fmt.Errorf("error getting transient: %v", err)
 	}
 
 	transientRetailJSON, ok := transientMap["retail_information"]
 	if !ok {
 		//log error to stdout
-		return fmt.Errorf("new retail not found in the transient map input")
+		return "", fmt.Errorf("new retail not found in the transient map input")
 	}
 
 
-	err = retailerContract.RetailDrug(ctx, transientRetailJSON)
+	retailedDrug, err := retailerContract.RetailDrug(ctx, transientRetailJSON)
 	if err != nil {
-		return fmt.Errorf("failed to retail drug: %v", err)
+		return "", fmt.Errorf("failed to retail drug: %v", err)
 	} 
 	
 
-	return nil
+	return retailedDrug, nil
 }
 
 // ViewHistory returns the chain of custody for a drug since issuance.

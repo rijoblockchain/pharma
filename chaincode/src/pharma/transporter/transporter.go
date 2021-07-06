@@ -17,8 +17,9 @@ type Transporter struct {
 
 
 // Invokes the UpdateShipment smart contract in transporter to update shipment transaction
-func (t *Transporter) UpdateShipment(ctx contractapi.TransactionContextInterface, shipmentInfo []byte) (*manufacturer.Shipment, error) {
+func (t *Transporter) UpdateShipment(ctx contractapi.TransactionContextInterface, shipmentInfo []byte) (string, error) {
 	type ShipmentData struct {
+		Org				string `json:"org"`	
 		BuyerCRN		string `json:"buyerCRN"`	
 		DrugName		string `json:"drugName"`
 		TransporterCRN	string `json:"transporterCRN"`
@@ -28,39 +29,39 @@ func (t *Transporter) UpdateShipment(ctx contractapi.TransactionContextInterface
 	
 	err := json.Unmarshal(shipmentInfo, &shipmentData)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal JSON: %v", err)
+		return "", fmt.Errorf("failed to unmarshal JSON: %v", err)
 	}
 
 	shipmentCompositeKey, err := ctx.GetStub().CreateCompositeKey("shipment.pharma-net.com", []string{shipmentData.BuyerCRN, shipmentData.DrugName})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create composite key: %v", err)
+		return "", fmt.Errorf("failed to create composite key: %v", err)
 	}
 
 	shipmentJSON, err := ctx.GetStub().GetState(shipmentCompositeKey) //get the Shipment details from chaincode state
 	if err != nil {
-		return nil, fmt.Errorf("failed to read Shipment: %v", err)
+		return "", fmt.Errorf("failed to read Shipment: %v", err)
 	}
 
 	//No Shipment found, return empty response
 	if shipmentJSON == nil {
-		return nil, fmt.Errorf("%v does not exist in state ledger", err)
+		return "", fmt.Errorf("%v does not exist in state ledger", err)
 	}
 
 	var updateShipment manufacturer.Shipment
 	err = json.Unmarshal(shipmentJSON, &updateShipment)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal JSON: %v", err)
+		return "", fmt.Errorf("failed to unmarshal JSON: %v", err)
 	}
 
 	updateShipment.Status = "Delivered"
 
 	marshaledUpdateShipment, err := json.Marshal(updateShipment)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal Shipment into JSON: %v", err)
+		return "", fmt.Errorf("failed to marshal Shipment into JSON: %v", err)
 	}
 	err = ctx.GetStub().PutState(shipmentCompositeKey, marshaledUpdateShipment)
 	if err != nil {
-		return nil, fmt.Errorf("failed to put Shipment: %v", err)
+		return "", fmt.Errorf("failed to put Shipment: %v", err)
 	}
 
 	for _, asset := range updateShipment.Assets {
@@ -72,17 +73,17 @@ func (t *Transporter) UpdateShipment(ctx contractapi.TransactionContextInterface
 
 		drugJSON, err := ctx.GetStub().GetState(asset) //get the drug details from chaincode state
 		if err != nil {
-			return nil, fmt.Errorf("failed to read drug: %v", err)
+			return "", fmt.Errorf("failed to read drug: %v", err)
 		}
 
 		//No Drug found, return empty response
 		if drugJSON == nil {
-			return nil, fmt.Errorf("%v does not exist in state ledger", err)
+			return "", fmt.Errorf("%v does not exist in state ledger", err)
 		}
 
 		err = json.Unmarshal(drugJSON, &drug)
 		if err != nil {
-			return nil, fmt.Errorf("failed to unmarshal JSON: %v", err)
+			return "", fmt.Errorf("failed to unmarshal JSON: %v", err)
 		}
 		
 		buyer, _ := getCompanyByPartialCompositeKey(ctx, shipmentData.BuyerCRN, "company.pharma-net.com")
@@ -96,16 +97,16 @@ func (t *Transporter) UpdateShipment(ctx contractapi.TransactionContextInterface
 
 		marshaledDrug, err := json.Marshal(drug)
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshal drug into JSON: %v", err)
+			return "", fmt.Errorf("failed to marshal drug into JSON: %v", err)
 		}
 		err = ctx.GetStub().PutState(asset, marshaledDrug)
 		if err != nil {
-			return nil, fmt.Errorf("failed to put drug: %v", err)
+			return "", fmt.Errorf("failed to put drug: %v", err)
 		}
 	}
 	
 	
-	return &updateShipment, nil
+	return string(marshaledUpdateShipment), nil
 
 
 }

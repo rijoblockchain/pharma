@@ -86,55 +86,55 @@ peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.pha
 
 
 
-export DRUG_INFORMATION=$(echo -n "{\"drugName\":\"Paracetamol\",\"serialNo\":\"Para1234\",\"mfgDate\":\"15/01/2021\",\"expDate\":\"20/02/2022\",\"companyCRN\":\"Manufacturer123\"}" | base64 | tr -d \\n)
+export DRUG_INFORMATION=$(echo -n "{\"org\":\"Manufacturer\",\"drugName\":\"Paracetamol\",\"serialNo\":\"Para1234\",\"mfgDate\":\"15/01/2021\",\"expDate\":\"20/02/2022\",\"companyCRN\":\"Manufacturer123\"}" | base64 | tr -d \\n)
 
 
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.pharma-net.com --tls --cafile "${PWD}/organizations/ordererOrganizations/pharma-net.com/orderers/orderer.pharma-net.com/msp/tlscacerts/tlsca.pharma-net.com-cert.pem" -C pharmachannel -n pharma --peerAddresses localhost:7051  --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/manufacturer.pharma-net.com/peers/peer0.manufacturer.pharma-net.com/tls/ca.crt"  -c '{"function":"AddDrug","Args":[]}' --transient "{\"drug_information\":\"$DRUG_INFORMATION\"}"
 
-export DRUG_INFORMATION=$(echo -n "{\"drugName\":\"Paracetamol\",\"serialNo\":\"Para1235\",\"mfgDate\":\"13/02/2021\",\"expDate\":\"17/05/2022\",\"companyCRN\":\"Manufacturer123\"}" | base64 | tr -d \\n)
+export DRUG_INFORMATION=$(echo -n "{\"org\":\"Manufacturer\",\"drugName\":\"Paracetamol\",\"serialNo\":\"Para1235\",\"mfgDate\":\"13/02/2021\",\"expDate\":\"17/05/2022\",\"companyCRN\":\"Manufacturer123\"}" | base64 | tr -d \\n)
 
 
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.pharma-net.com --tls --cafile "${PWD}/organizations/ordererOrganizations/pharma-net.com/orderers/orderer.pharma-net.com/msp/tlscacerts/tlsca.pharma-net.com-cert.pem" -C pharmachannel -n pharma --peerAddresses localhost:7051  --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/manufacturer.pharma-net.com/peers/peer0.manufacturer.pharma-net.com/tls/ca.crt"  -c '{"function":"AddDrug","Args":[]}' --transient "{\"drug_information\":\"$DRUG_INFORMATION\"}"
 
-export DRUG_INFORMATION=$(echo -n "{\"drugName\":\"Paracetamol\",\"serialNo\":\"Para1236\",\"mfgDate\":\"06/03/2021\",\"expDate\":\"23/05/2022\",\"companyCRN\":\"Manufacturer123\"}" | base64 | tr -d \\n)
+export DRUG_INFORMATION=$(echo -n "{\"org\":\"Manufacturer\",\"drugName\":\"Paracetamol\",\"serialNo\":\"Para1236\",\"mfgDate\":\"06/03/2021\",\"expDate\":\"23/05/2022\",\"companyCRN\":\"Manufacturer123\"}" | base64 | tr -d \\n)
 
 
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.pharma-net.com --tls --cafile "${PWD}/organizations/ordererOrganizations/pharma-net.com/orderers/orderer.pharma-net.com/msp/tlscacerts/tlsca.pharma-net.com-cert.pem" -C pharmachannel -n pharma --peerAddresses localhost:7051  --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/manufacturer.pharma-net.com/peers/peer0.manufacturer.pharma-net.com/tls/ca.crt"  -c '{"function":"AddDrug","Args":[]}' --transient "{\"drug_information\":\"$DRUG_INFORMATION\"}"
 
 
-export PO_INFORMATION=$(echo -n "{\"buyerCRN\":\"Distributor123\",\"sellerCRN\":\"Manufacturer123\",\"drugName\":\"Paracetamol\",\"quantity\":3}" | base64 | tr -d \\n)
+export PO_INFORMATION=$(echo -n "{\"org\":\"Distributor\",\"buyerCRN\":\"Distributor123\",\"sellerCRN\":\"Manufacturer123\",\"drugName\":\"Paracetamol\",\"quantity\":3}" | base64 | tr -d \\n)
 
 
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.pharma-net.com --tls --cafile "${PWD}/organizations/ordererOrganizations/pharma-net.com/orderers/orderer.pharma-net.com/msp/tlscacerts/tlsca.pharma-net.com-cert.pem" -C pharmachannel -n pharma --peerAddresses localhost:7051  --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/manufacturer.pharma-net.com/peers/peer0.manufacturer.pharma-net.com/tls/ca.crt"  -c '{"function":"CreatePO","Args":[]}' --transient "{\"po_information\":\"$PO_INFORMATION\"}"
 
-export SHIPMENT_INFORMATION=$(echo -n "{\"buyerCRN\":\"Distributor123\",\"drugName\":\"Paracetamol\",\"listOfAssets\":[\"Para1234\",\"Para1235\",\"Para1236\"],\"transporterCRN\":\"Transporter123\"}" | base64 | tr -d \\n)
+export SHIPMENT_INFORMATION=$(echo -n "{\"org\":\"Manufacturer\",\"buyerCRN\":\"Distributor123\",\"drugName\":\"Paracetamol\",\"listOfAssets\":[\"Para1234\",\"Para1235\",\"Para1236\"],\"transporterCRN\":\"Transporter123\"}" | base64 | tr -d \\n)
 
 
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.pharma-net.com --tls --cafile "${PWD}/organizations/ordererOrganizations/pharma-net.com/orderers/orderer.pharma-net.com/msp/tlscacerts/tlsca.pharma-net.com-cert.pem" -C pharmachannel -n pharma --peerAddresses localhost:7051  --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/manufacturer.pharma-net.com/peers/peer0.manufacturer.pharma-net.com/tls/ca.crt"  -c '{"function":"CreateShipment","Args":[]}' --transient "{\"shipment_information\":\"$SHIPMENT_INFORMATION\"}"
 
-export UPDATE_INFORMATION=$(echo -n "{\"buyerCRN\":\"Distributor123\",\"drugName\":\"Paracetamol\",\"transporterCRN\":\"Transporter123\"}" | base64 | tr -d \\n)
+export UPDATE_INFORMATION=$(echo -n "{\"org\":\"Transporter\",\"buyerCRN\":\"Distributor123\",\"drugName\":\"Paracetamol\",\"transporterCRN\":\"Transporter123\"}" | base64 | tr -d \\n)
 
 
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.pharma-net.com --tls --cafile "${PWD}/organizations/ordererOrganizations/pharma-net.com/orderers/orderer.pharma-net.com/msp/tlscacerts/tlsca.pharma-net.com-cert.pem" -C pharmachannel -n pharma --peerAddresses localhost:7051  --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/manufacturer.pharma-net.com/peers/peer0.manufacturer.pharma-net.com/tls/ca.crt"  -c '{"function":"UpdateShipment","Args":[]}' --transient "{\"update_information\":\"$UPDATE_INFORMATION\"}"
 
 
 
-export PO_INFORMATION=$(echo -n "{\"buyerCRN\":\"Retailer123\",\"sellerCRN\":\"Distributor123\",\"drugName\":\"Paracetamol\",\"quantity\":3}" | base64 | tr -d \\n)
+export PO_INFORMATION=$(echo -n "{\"org\":\"Retailer\",\"buyerCRN\":\"Retailer123\",\"sellerCRN\":\"Distributor123\",\"drugName\":\"Paracetamol\",\"quantity\":3}" | base64 | tr -d \\n)
 
 
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.pharma-net.com --tls --cafile "${PWD}/organizations/ordererOrganizations/pharma-net.com/orderers/orderer.pharma-net.com/msp/tlscacerts/tlsca.pharma-net.com-cert.pem" -C pharmachannel -n pharma --peerAddresses localhost:7051  --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/manufacturer.pharma-net.com/peers/peer0.manufacturer.pharma-net.com/tls/ca.crt"  -c '{"function":"CreatePO","Args":[]}' --transient "{\"po_information\":\"$PO_INFORMATION\"}"
 
-export SHIPMENT_INFORMATION=$(echo -n "{\"buyerCRN\":\"Retailer123\",\"drugName\":\"Paracetamol\",\"listOfAssets\":[\"Para1234\",\"Para1235\",\"Para1236\"],\"transporterCRN\":\"Transporter123\"}" | base64 | tr -d \\n)
+export SHIPMENT_INFORMATION=$(echo -n "{\"org\":\"Distributor\",\"buyerCRN\":\"Retailer123\",\"drugName\":\"Paracetamol\",\"listOfAssets\":[\"Para1234\",\"Para1235\",\"Para1236\"],\"transporterCRN\":\"Transporter123\"}" | base64 | tr -d \\n)
 
 
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.pharma-net.com --tls --cafile "${PWD}/organizations/ordererOrganizations/pharma-net.com/orderers/orderer.pharma-net.com/msp/tlscacerts/tlsca.pharma-net.com-cert.pem" -C pharmachannel -n pharma --peerAddresses localhost:7051  --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/manufacturer.pharma-net.com/peers/peer0.manufacturer.pharma-net.com/tls/ca.crt"  -c '{"function":"CreateShipment","Args":[]}' --transient "{\"shipment_information\":\"$SHIPMENT_INFORMATION\"}"
 
-export UPDATE_INFORMATION=$(echo -n "{\"buyerCRN\":\"Retailer123\",\"drugName\":\"Paracetamol\",\"transporterCRN\":\"Transporter123\"}" | base64 | tr -d \\n)
+export UPDATE_INFORMATION=$(echo -n "{\"org\":\"Transporter\",\"buyerCRN\":\"Retailer123\",\"drugName\":\"Paracetamol\",\"transporterCRN\":\"Transporter123\"}" | base64 | tr -d \\n)
 
 
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.pharma-net.com --tls --cafile "${PWD}/organizations/ordererOrganizations/pharma-net.com/orderers/orderer.pharma-net.com/msp/tlscacerts/tlsca.pharma-net.com-cert.pem" -C pharmachannel -n pharma --peerAddresses localhost:7051  --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/manufacturer.pharma-net.com/peers/peer0.manufacturer.pharma-net.com/tls/ca.crt"  -c '{"function":"UpdateShipment","Args":[]}' --transient "{\"update_information\":\"$UPDATE_INFORMATION\"}"
 
-export RETAIL_INFORMATION=$(echo -n "{\"drugName\":\"Paracetamol\",\"serialNo\":\"Para1234\",\"retailerCRN\":\"Retailer123\",\"customerAadhar\":\"654762332163\"}" | base64 | tr -d \\n)
+export RETAIL_INFORMATION=$(echo -n "{\"org\":\"Retailer\",\"drugName\":\"Paracetamol\",\"serialNo\":\"Para1234\",\"retailerCRN\":\"Retailer123\",\"customerAadhar\":\"654762332163\"}" | base64 | tr -d \\n)
 
 
 peer chaincode invoke -o localhost:7050 --ordererTLSHostnameOverride orderer.pharma-net.com --tls --cafile "${PWD}/organizations/ordererOrganizations/pharma-net.com/orderers/orderer.pharma-net.com/msp/tlscacerts/tlsca.pharma-net.com-cert.pem" -C pharmachannel -n pharma --peerAddresses localhost:7051  --tlsRootCertFiles "${PWD}/organizations/peerOrganizations/manufacturer.pharma-net.com/peers/peer0.manufacturer.pharma-net.com/tls/ca.crt"  -c '{"function":"RetailDrug","Args":[]}' --transient "{\"retail_information\":\"$RETAIL_INFORMATION\"}"

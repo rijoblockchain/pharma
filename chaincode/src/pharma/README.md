@@ -1,10 +1,10 @@
-cd ~/pharma-net/chaincode/src/pharma
+cd ~/Capstone_Project_Rijo_Thomas/pharma-net/chaincode/src/pharma
 
 
 go mod init pharma
 go build main.go
 
-cd ~/pharma-net/network
+cd ~/Capstone_Project_Rijo_Thomas/pharma-net/network
 
 ./network.sh up createChannel -ca -s couchdb
 

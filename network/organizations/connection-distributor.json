@@ -1,0 +1,87 @@
+ {
+    "name": "pharma-net",
+    "version": "1.0.0",
+    "client": {
+        "organization": "Distributor",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "300",
+                    "eventHub": "300",
+                    "eventReg": "300"
+                },
+                "orderer": "300"
+            }
+        }
+    },
+    "channels": {
+        "pharmachannel": {
+            "orderers": [
+                "orderer.pharma-net.com"
+            ],
+            "peers": [
+                "peer0.distributor.pharma-net.com",
+                "peer1.distributor.pharma-net.com"  
+            ]    
+        }
+    },  
+    "organizations": {
+        "Distributor": {
+            "mspid": "distributorMSP",
+            "peers": [
+                "peer0.distributor.pharma-net.com",
+                "peer1.distributor.pharma-net.com"
+            ],
+            "certificateAuthorities": [
+                "ca.distributor.pharma-net.com"
+            ]
+        }
+    },
+    "orderers": {
+        "orderer.pharma-net.com": {
+            "url": "grpcs://localhost:7050",
+            "grpcOptions": {
+                "ssl-target-name-override": "orderer.pharma-net.com"
+            },             
+            "tlsCACerts": {
+                "path": "/home/rijo/Capstone_Project_Rijo_Thomas/pharma-net/network/organizations/ordererOrganizations/pharma-net.com/msp/tlscacerts/tlsca.pharma-net.com-cert.pem" 
+            }
+        }   
+    },  
+    "peers": {
+        "peer0.distributor.pharma-net.com": {
+            "url": "grpcs://localhost:9051",
+            "tlsCACerts": {
+                "path": "/home/rijo/Capstone_Project_Rijo_Thomas/pharma-net/network/organizations/peerOrganizations/distributor.pharma-net.com/tlsca/tlsca.distributor.pharma-net.com-cert.pem"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer0.distributor.pharma-net.com",
+                "hostnameOverride": "peer0.distributor.pharma-net.com",
+                "request-timeout": 120001
+            }
+        },
+        "peer1.distributor.pharma-net.com": {
+            "url": "grpcs://localhost:10051",
+            "tlsCACerts": {
+                "path": "/home/rijo/Capstone_Project_Rijo_Thomas/pharma-net/network/organizations/peerOrganizations/distributor.pharma-net.com/tlsca/tlsca.distributor.pharma-net.com-cert.pem"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer1.distributor.pharma-net.com",
+                "hostnameOverride": "peer1.distributor.pharma-net.com",
+                "request-timeout": 120001
+            }
+        }
+    },
+    "certificateAuthorities": {
+        "ca.distributor.pharma-net.com": {
+            "url": "https://localhost:8054",
+            "caName": "ca-distributor",
+            "tlsCACerts": {
+                "path": ["/home/rijo/Capstone_Project_Rijo_Thomas/pharma-net/network/organizations/peerOrganizations/distributor.pharma-net.com/tlsca/tlsca.distributor.pharma-net.com-cert.pem"]
+            },
+            "httpOptions": {
+                "verify": false
+            }
+        }
+    }
+}

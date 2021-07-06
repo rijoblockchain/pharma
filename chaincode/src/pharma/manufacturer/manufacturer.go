@@ -28,6 +28,7 @@ type Company struct {
 
 type Drug struct {	
 	DocType				string `json:"docType"`
+	Org					string `json:"org"`	
 	ProductID			string `json:"productID"`
 	Name				string `json:"name"`
 	Manufacturer		string `json:"manufacturer"`
@@ -39,6 +40,7 @@ type Drug struct {
 
 type Shipment struct {	
 	DocType				string `json:"docType"`
+	Org					string `json:"org"`	
 	ShippingID			string `json:"shippingID"`
 	Creator				string `json:"creator"`
 	Assets			  []string `json:"assets"`
@@ -47,11 +49,12 @@ type Shipment struct {
 }
 
 // Invokes the AddDrug smart contract to add a drug to the state ledger
-func (m *Manufacturer) AddDrug(ctx contractapi.TransactionContextInterface, drugInfo []byte) (*Drug, error) {
+func (m *Manufacturer) AddDrug(ctx contractapi.TransactionContextInterface, drugInfo []byte) (string, error) {
 	
 	//clientMSPID, err:= ctx.GetClientIdentity().GetMSPID()
 
 	type DrugInfo struct {
+		Org				string `json:"org"`	
 		DrugName		string `json:"drugName"`	
 		SerialNo		string `json:"serialNo"`
 		MfgDate			string `json:"mfgDate"`
@@ -63,12 +66,12 @@ func (m *Manufacturer) AddDrug(ctx contractapi.TransactionContextInterface, drug
 	
 	err := json.Unmarshal(drugInfo, &drugData)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal JSON: %v", err)
+		return "", fmt.Errorf("failed to unmarshal JSON: %v", err)
 	}
 
 	drugCompositeKey, err := ctx.GetStub().CreateCompositeKey("drug.pharma-net.com", []string{drugData.DrugName, drugData.SerialNo})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create composite key: %v", err)
+		return "", fmt.Errorf("failed to create composite key: %v", err)
 	}
 
 	manufacturer, _ := 	getCompanyByPartialCompositeKey(ctx, drugData.CompanyCRN, "company.pharma-net.com")
@@ -80,6 +83,7 @@ func (m *Manufacturer) AddDrug(ctx contractapi.TransactionContextInterface, drug
 
 	newDrug := Drug {
 		DocType:			"drug",
+		Org:				drugData.Org,
 		ProductID:			drugCompositeKey,
 		Name:				drugData.DrugName,
 		Manufacturer:		manufacturer.CompanyID,
@@ -92,21 +96,22 @@ func (m *Manufacturer) AddDrug(ctx contractapi.TransactionContextInterface, drug
 
 	marshaledDrug, err := json.Marshal(newDrug)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal drug into JSON: %v", err)
+		return "", fmt.Errorf("failed to marshal drug into JSON: %v", err)
 	}
 	err = ctx.GetStub().PutState(drugCompositeKey, marshaledDrug)
 	if err != nil {
-		return nil, fmt.Errorf("failed to put drug: %v", err)
+		return "", fmt.Errorf("failed to put drug: %v", err)
 	}
 	
-	return &newDrug, nil
+	return string(marshaledDrug), nil
 
 }
 
 
 // Invokes the CreateShipment smart contract to create shipment asset to the state ledger
-func (manufacturer *Manufacturer) CreateShipment(ctx contractapi.TransactionContextInterface, shipmentInfo []byte) (*Shipment, error) {
+func (manufacturer *Manufacturer) CreateShipment(ctx contractapi.TransactionContextInterface, shipmentInfo []byte) (string, error) {
 	type ShipmentData struct {
+		Org				string `json:"org"`	
 		BuyerCRN		string `json:"buyerCRN"`	
 		DrugName		string `json:"drugName"`
 		ListOfAssets  []string `json:"listOfAssets"`
@@ -117,37 +122,37 @@ func (manufacturer *Manufacturer) CreateShipment(ctx contractapi.TransactionCont
 	
 	err := json.Unmarshal(shipmentInfo, &shipmentData)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal JSON: %v", err)
+		return "", fmt.Errorf("failed to unmarshal JSON: %v", err)
 	}
 
 	shipmentCompositeKey, err := ctx.GetStub().CreateCompositeKey("shipment.pharma-net.com", []string{shipmentData.BuyerCRN, shipmentData.DrugName})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create composite key: %v", err)
+		return "", fmt.Errorf("failed to create composite key: %v", err)
 	}
 
 	poCompositeKey, err := ctx.GetStub().CreateCompositeKey("po.pharma-net.com", []string{shipmentData.BuyerCRN, shipmentData.DrugName})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create composite key: %v", err)
+		return "", fmt.Errorf("failed to create composite key: %v", err)
 	}
 
 	poJSON, err := ctx.GetStub().GetState(poCompositeKey) //get the PO details from chaincode state
 	if err != nil {
-		return nil, fmt.Errorf("failed to read PO: %v", err)
+		return "", fmt.Errorf("failed to read PO: %v", err)
 	}
 
 	//No PO found, return empty response
 	if poJSON == nil {
-		return nil, fmt.Errorf("%v does not exist in state ledger", err)
+		return "", fmt.Errorf("%v does not exist in state ledger", err)
 	}
 
 	var po distributor.PurchaseOrder
 	err = json.Unmarshal(poJSON, &po)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal JSON: %v", err)
+		return "", fmt.Errorf("failed to unmarshal JSON: %v", err)
 	}
 
 	if po.Quantity != len(shipmentData.ListOfAssets) {
-		return nil, fmt.Errorf("The length of listOfAssets should be exactly equal to the quantity specified in the PO")
+		return "", fmt.Errorf("The length of listOfAssets should be exactly equal to the quantity specified in the PO")
 	}
 
 	transporter, _ := 	getCompanyByPartialCompositeKey(ctx, shipmentData.TransporterCRN, "company.pharma-net.com")
@@ -158,22 +163,22 @@ func (manufacturer *Manufacturer) CreateShipment(ctx contractapi.TransactionCont
 		var drug Drug
 		drugCompositeKey, err := ctx.GetStub().CreateCompositeKey("drug.pharma-net.com", []string{shipmentData.DrugName, asset})
 		if err != nil {
-			return nil, fmt.Errorf("failed to create composite key: %v", err)
+			return "", fmt.Errorf("failed to create composite key: %v", err)
 		}
 
 		drugJSON, err := ctx.GetStub().GetState(drugCompositeKey) //get the drug details from chaincode state
 		if err != nil {
-			return nil, fmt.Errorf("failed to read drug: %v", err)
+			return "", fmt.Errorf("failed to read drug: %v", err)
 		}
 
 		//No Drug found, return empty response
 		if drugJSON == nil {
-			return nil, fmt.Errorf("%v does not exist in state ledger", err)
+			return "", fmt.Errorf("%v does not exist in state ledger", err)
 		}
 
 		err = json.Unmarshal(drugJSON, &drug)
 		if err != nil {
-			return nil, fmt.Errorf("failed to unmarshal JSON: %v", err)
+			return "", fmt.Errorf("failed to unmarshal JSON: %v", err)
 		}
 
 		shipmentAssets = append(shipmentAssets, drugCompositeKey)	
@@ -183,11 +188,11 @@ func (manufacturer *Manufacturer) CreateShipment(ctx contractapi.TransactionCont
 
 		marshaledDrug, err := json.Marshal(drug)
 		if err != nil {
-			return nil, fmt.Errorf("failed to marshal drug into JSON: %v", err)
+			return "", fmt.Errorf("failed to marshal drug into JSON: %v", err)
 		}
 		err = ctx.GetStub().PutState(drugCompositeKey, marshaledDrug)
 		if err != nil {
-			return nil, fmt.Errorf("failed to put drug: %v", err)
+			return "", fmt.Errorf("failed to put drug: %v", err)
 		}
 	}
 	
@@ -195,7 +200,8 @@ func (manufacturer *Manufacturer) CreateShipment(ctx contractapi.TransactionCont
 	
 
 	newShipment := Shipment {
-		DocType:			"shipment",				
+		DocType:			"shipment",	
+		Org:				shipmentData.Org,				
 		ShippingID:			shipmentCompositeKey,
 		Creator:			po.Seller,
 		Assets:				shipmentAssets,			    
@@ -206,14 +212,14 @@ func (manufacturer *Manufacturer) CreateShipment(ctx contractapi.TransactionCont
 
 	marshaledShipment, err := json.Marshal(newShipment)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal Shipment into JSON: %v", err)
+		return "", fmt.Errorf("failed to marshal Shipment into JSON: %v", err)
 	}
 	err = ctx.GetStub().PutState(shipmentCompositeKey, marshaledShipment)
 	if err != nil {
-		return nil, fmt.Errorf("failed to put Shipment: %v", err)
+		return "", fmt.Errorf("failed to put Shipment: %v", err)
 	}
 	
-	return &newShipment, nil
+	return string(marshaledShipment), nil
 	
 } 
 

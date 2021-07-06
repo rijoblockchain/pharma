@@ -1,0 +1,87 @@
+ {
+    "name": "pharma-net",
+    "version": "1.0.0",
+    "client": {
+        "organization": "Consumer",
+        "connection": {
+            "timeout": {
+                "peer": {
+                    "endorser": "300",
+                    "eventHub": "300",
+                    "eventReg": "300"
+                },
+                "orderer": "300"
+            }
+        }
+    },
+    "channels": {
+        "pharmachannel": {
+            "orderers": [
+                "orderer.pharma-net.com"
+            ],
+            "peers": [
+                "peer0.consumer.pharma-net.com",
+                "peer1.consumer.pharma-net.com"  
+            ]    
+        }
+    },  
+    "organizations": {
+        "Consumer": {
+            "mspid": "consumerMSP",
+            "peers": [
+                "peer0.consumer.pharma-net.com",
+                "peer1.consumer.pharma-net.com"
+            ],
+            "certificateAuthorities": [
+                "ca.consumer.pharma-net.com"
+            ]
+        }
+    },
+    "orderers": {
+        "orderer.pharma-net.com": {
+            "url": "grpcs://localhost:7050",
+            "grpcOptions": {
+                "ssl-target-name-override": "orderer.pharma-net.com"
+            },             
+            "tlsCACerts": {
+                "path": "/home/rijo/Capstone_Project_Rijo_Thomas/pharma-net/network/organizations/ordererOrganizations/pharma-net.com/msp/tlscacerts/tlsca.pharma-net.com-cert.pem" 
+            }
+        }   
+    },  
+    "peers": {
+        "peer0.consumer.pharma-net.com": {
+            "url": "grpcs://localhost:13051",
+            "tlsCACerts": {
+                "path": "/home/rijo/Capstone_Project_Rijo_Thomas/pharma-net/network/organizations/peerOrganizations/consumer.pharma-net.com/tlsca/tlsca.consumer.pharma-net.com-cert.pem"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer0.consumer.pharma-net.com",
+                "hostnameOverride": "peer0.consumer.pharma-net.com",
+                "request-timeout": 120001
+            }
+        },
+        "peer1.consumer.pharma-net.com": {
+            "url": "grpcs://localhost:14051",
+            "tlsCACerts": {
+                "path": "/home/rijo/Capstone_Project_Rijo_Thomas/pharma-net/network/organizations/peerOrganizations/consumer.pharma-net.com/tlsca/tlsca.consumer.pharma-net.com-cert.pem"
+            },
+            "grpcOptions": {
+                "ssl-target-name-override": "peer1.consumer.pharma-net.com",
+                "hostnameOverride": "peer1.consumer.pharma-net.com",
+                "request-timeout": 120001
+            }
+        }
+    },
+    "certificateAuthorities": {
+        "ca.consumer.pharma-net.com": {
+            "url": "https://localhost:10054",
+            "caName": "ca-consumer",
+            "tlsCACerts": {
+                "path": ["/home/rijo/Capstone_Project_Rijo_Thomas/pharma-net/network/organizations/peerOrganizations/consumer.pharma-net.com/tlsca/tlsca.consumer.pharma-net.com-cert.pem"]
+            },
+            "httpOptions": {
+                "verify": false
+            }
+        }
+    }
+}

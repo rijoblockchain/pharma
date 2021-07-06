@@ -26,6 +26,7 @@ type Company struct {
 }
 
 type PurchaseOrder struct {	
+	Org					string `json:"org"`	
 	POID				string `json:"poID"`
 	DrugName			string `json:"drugName"`
 	Quantity			int    `json:"quantity"`
@@ -34,8 +35,9 @@ type PurchaseOrder struct {
 }
 
 // Invokes the CreatePO smart contract to create purchase order to the state ledger
-func (d *Distributor) CreatePO(ctx contractapi.TransactionContextInterface, poInfo []byte) (*PurchaseOrder, error) {
+func (d *Distributor) CreatePO(ctx contractapi.TransactionContextInterface, poInfo []byte) (string, error) {
 	type POData struct {
+		Org				string `json:"org"`	
 		BuyerCRN		string `json:"buyerCRN"`	
 		SellerCRN		string `json:"sellerCRN"`
 		DrugName		string `json:"drugName"`
@@ -46,12 +48,12 @@ func (d *Distributor) CreatePO(ctx contractapi.TransactionContextInterface, poIn
 	
 	err := json.Unmarshal(poInfo, &poData)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal JSON: %v", err)
+		return "", fmt.Errorf("failed to unmarshal JSON: %v", err)
 	}
 
 	poCompositeKey, err := ctx.GetStub().CreateCompositeKey("po.pharma-net.com", []string{poData.BuyerCRN, poData.DrugName})
 	if err != nil {
-		return nil, fmt.Errorf("failed to create composite key: %v", err)
+		return "", fmt.Errorf("failed to create composite key: %v", err)
 	}
 
 	
@@ -60,12 +62,13 @@ func (d *Distributor) CreatePO(ctx contractapi.TransactionContextInterface, poIn
 	seller, _ := getCompanyByPartialCompositeKey(ctx, poData.SellerCRN, "company.pharma-net.com")
 	
 	if buyer.HierarchyKey - seller.HierarchyKey != 1 {
-		return nil, fmt.Errorf("%v not allowed to buy from %v", buyer.Name, seller.Name)
+		return "", fmt.Errorf("%v not allowed to buy from %v", buyer.Name, seller.Name)
 	}
 	//buyerCompositeKey, err := ctx.GetStub().CreateCompositeKey("company.pharma-net.com", []string{buyer[0].Name, poData.BuyerCRN})
 	//sellerCompositeKey, err := ctx.GetStub().CreateCompositeKey("company.pharma-net.com", []string{seller[0].Name, poData.SellerCRN})
 
 	newPO := PurchaseOrder {
+		Org:				poData.Org,	
 		POID:				poCompositeKey,
 		DrugName:			poData.DrugName,
 		Quantity:			poData.Quantity,
@@ -76,14 +79,14 @@ func (d *Distributor) CreatePO(ctx contractapi.TransactionContextInterface, poIn
 
 	marshaledPO, err := json.Marshal(newPO)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal PO into JSON: %v", err)
+		return "", fmt.Errorf("failed to marshal PO into JSON: %v", err)
 	}
 	err = ctx.GetStub().PutState(poCompositeKey, marshaledPO)
 	if err != nil {
-		return nil, fmt.Errorf("failed to put PO: %v", err)
+		return "", fmt.Errorf("failed to put PO: %v", err)
 	}
 	
-	return &newPO, nil
+	return string(marshaledPO), nil
 	
 }
 
