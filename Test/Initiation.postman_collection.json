@@ -1,0 +1,283 @@
+{
+	"info": {
+		"_postman_id": "c3b4d01c-f79c-4b15-ab6c-adf2a772c0b2",
+		"name": "Initiation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Manufacturer - Sun Pharma",
+			"item": [
+				{
+					"name": "localhost:3000/registerCompany",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"docType\": \"company\",\n    \"companyCRN\": \"MAN001\",\n    \"name\": \"Sun Pharma\",\n    \"location\": \"Chennai\",\n    \"organizationRole\": \"Manufacturer\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/registerCompany",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"registerCompany"
+							]
+						},
+						"description": "Register new company"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transporter - FedEx",
+			"item": [
+				{
+					"name": "localhost:3000/registerCompany",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"docType\": \"company\",\n    \"companyCRN\": \"TRA001\",\n    \"name\": \"FedEx\",\n    \"location\": \"Delhi\",\n    \"organizationRole\": \"Transporter\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/registerCompany",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"registerCompany"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Transporter - Blue Dart",
+			"item": [
+				{
+					"name": "localhost:3000/registerCompany",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"docType\": \"company\",\n    \"companyCRN\": \"TRA002\",\n    \"name\": \"Blue Dart\",\n    \"location\": \"Bangalore\",\n    \"organizationRole\": \"Transporter\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/registerCompany",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"registerCompany"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Distributor - VG Pharma",
+			"item": [
+				{
+					"name": "localhost:3000/registerCompany",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"docType\": \"company\",\n    \"companyCRN\": \"DIST001\",\n    \"name\": \"VG Pharma\",\n    \"location\": \"Vizag\",\n    \"organizationRole\": \"Distributor\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/registerCompany",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"registerCompany"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Retailer - upgrad",
+			"item": [
+				{
+					"name": "localhost:3000/registerCompany",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"docType\": \"company\",\n    \"companyCRN\": \"RET002\",\n    \"name\": \"upgrad\",\n    \"location\": \"Mumbai\",\n    \"organizationRole\": \"Retailer\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/registerCompany",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"registerCompany"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Drug",
+			"item": [
+				{
+					"name": "localhost:3000/addDrug",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"org\":\"Manufacturer\",\n    \"drugName\":\"Paracetamol\",\n    \"serialNo\":\"001\",\n    \"mfgDate\":\"15/01/2021\",\n    \"expDate\":\"20/02/2022\",\n    \"companyCRN\":\"MAN001\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/addDrug",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"addDrug"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:3000/addDrug",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"org\":\"Manufacturer\",\n    \"drugName\":\"Paracetamol\",\n    \"serialNo\":\"002\",\n    \"mfgDate\":\"13/02/2021\",\n    \"expDate\":\"17/05/2022\",\n    \"companyCRN\":\"MAN001\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/addDrug",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"addDrug"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:3000/addDrug",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"org\":\"Manufacturer\",\n    \"drugName\":\"Paracetamol\",\n    \"serialNo\":\"003\",\n    \"mfgDate\":\"06/03/2021\",\n    \"expDate\":\"23/05/2022\",\n    \"companyCRN\":\"MAN001\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/addDrug",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"addDrug"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "localhost:3000/addDrug",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"org\":\"Manufacturer\",\n    \"drugName\":\"Paracetamol\",\n    \"serialNo\":\"004\",\n    \"mfgDate\":\"30/04/2021\",\n    \"expDate\":\"15/09/2022\",\n    \"companyCRN\":\"MAN001\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:3000/addDrug",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"addDrug"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

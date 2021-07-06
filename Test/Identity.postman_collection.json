@@ -1,0 +1,38 @@
+{
+	"info": {
+		"_postman_id": "981f3a4c-8a0d-4f7b-9d15-e538bc7df5b2",
+		"name": "Identity",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "localhost:3000/addToWallet",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "org",
+							"value": "Manufacturer",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3000/addToWallet",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"addToWallet"
+					]
+				},
+				"description": "Create Identity for each organization"
+			},
+			"response": []
+		}
+	]
+}
